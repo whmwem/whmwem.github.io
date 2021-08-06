@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="main.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #222;
+        }
+
+        .box {
+            width: 800px;
+            height: 300px;
+            margin: 0 auto;
+            margin-top: 150px;
+            border: 1px solid rgb(133, 172, 190);
+            background-color: black;
+
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .content {
+            width: 75px;
+            height: 125px;
+            /* border: 1px solid red; */
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .content:nth-child(2n) {
+            margin-right: 50px;
+        }
+
+        .content:nth-child(2n + 1) {
+            margin-right: 25px;
+        }
+
+        .content li {
+            width: 25px;
+            height: 25px;
+            /* background-color: black; */
+            padding: 2px;
+            box-sizing: border-box;
+            background-clip: content-box;
+
+            transition: all 0.3s;
+            /* transition: all 3s; */
+            transform: scale(0.5);
+            /* border-radius: 50%; */
+        }
+
+        .content li.active {
+            background-color: white;
+            transform: scale(1);
+        }
+
+        .mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* 显示出改变的掉落点 */
+        .mask li.animate-dot {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            padding: 2px;
+            box-sizing: border-box;
+            background-clip: content-box;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <!-- 显示时间 -->
+        <section class="stage"></section>
+        <!-- 掉落的小点 -->
+        <ul class="mask"></ul>
+    </div>
+    <script>
+        ////掉落的小点 构造器使用
+        var mask = document.querySelector(".mask");
+
+        // 随机生成的随机数  用来控制每一块下落速度  每一块不一样
+        function randomNum(m, n) {
+
+            return Math.random() * (n - m) + m;
+        }
+        // 跳动的点 构造器
+        function AnimateDot(x, y, node) {
+            // x轴位置
+            this.x = x;
+            // y轴位置
+            this.y = y;
+            // node节点
+            this.node = node;
+
+            // y轴下落速度的随机数
+            this.speedY = randomNum(3, 5);
+            // x轴下落速度的随机数
+            this.speedX = randomNum(2, 5) * (Math.random() - 0.5 > 0 ? 1 : -1);//随机取正数  没有0
+        }
+
+        // 掉落小点的动画事件
+        AnimateDot.prototype.move = function () {
+            // +=是往下掉  -=是往上
+            this.speedY += 1;
+            this.y += this.speedY;
+            this.x += this.speedX;
+            this.node.style.top = this.y + "px";
+            this.node.style.left = this.x + "px";
+        };
+
+        // 判断超出范围就清除掉
+        AnimateDot.prototype.checkOver = function (index) {
+            // y轴  是否大于等于window的高度
+            var overY = this.y >= window.innerHeight - 25;
+            // x轴 是否大于等于window的宽度并且小于它本身
+            var overX = this.x >= window.innerWidth || this.x <= -25;
+            // console.log(this.x, this.y, overX);
+
+            // 判断x轴的跳动
+            if (overX) {
+                // 删除
+                mask.removeChild(this.node);
+                // 接着删除某一项
+                allAnimateDots.splice(index, 1);//index带的参数  1是删除一个
+            }
+            // 判断y轴的跳动
+            if (overY) {
+                this.speedY = -this.speedY * 1;
+            }
+        };
+
+        // 构造器使用
+        // 11111111
+        function Num(x) {
+            this.num = x;
+        }
+
+        //  根据数值获取坐标
+        Num.prototype.calcCoor = function () {
+            return matrix[this.num];
+        };
+
+        //  创建每个数字 的所有dom元素
+        Num.prototype.create = function () {
+            this.coor = this.calcCoor();
+
+            var content = document.createElement("ul");
+            content.classList.add("content");
+
+            // 根据coor二维数组 生成 dom节点 并把节点也映射为二维坐标 并保存到当前对象nodes属性
+            // 这里保存到nodes目的是方便后面更新获取 所有的 dot节点
+            // nodes格式为二维数组 方便后面根据coor更新 一维数组也可以比较麻烦
+            var nodes = [];
+            this.coor.forEach(function (row, rowIndex) {
+                var rowNodes = [];
+                row.forEach(function (col, colIndex) {
+                    // console.log(row, col);
+                    var dot = document.createElement("li");
+                    rowNodes.push(dot);
+                    content.appendChild(dot);
+                });
+                nodes.push(rowNodes);
+            });
+
+            // 将所有节点数组保存到属性
+            this.nodes = nodes;
+
+            document.querySelector(".stage").appendChild(content);
+
+            return this;
+        };
+
+        //  根据当前数值更新坐标并 更新所有dot的class
+        Num.prototype.update = function (n) {
+            // 更新 num coor
+            if (n !== undefined) {
+                this.num = n;
+            }
+            // 存一个旧的
+            this.oldCoor = this.coor;
+            // 新的
+            this.coor = this.calcCoor();
+
+            // 根据新坐标重新确定每个点的class
+            var _this = this;
+            // forEach内部 this指向 window。
+            this.coor.forEach(function (row, rowIndex) {
+                row.forEach(function (col, colIndex) {
+                    if (col) {
+                        //   console.log(this);
+                        _this.nodes[rowIndex][colIndex].classList.add("active");
+                    } else {
+                        _this.nodes[rowIndex][colIndex].classList.remove("active");
+                    }
+                });
+            });
+            return this;
+        };
+
+
+        //   用来掉落
+
+
+        //一个数组放 所有掉落的方块的事件
+        var allAnimateDots = [];
+
+
+
+        // 对比 新老坐标 那个dot li是被隐藏的
+        Num.prototype.checkHide = function () {
+            var _this = this;//this 当前的一个对象
+            // 遍历第一项
+            this.coor.forEach(function (row, rowIndex) {
+                // 二层遍历 里面的每一项
+                row.forEach(function (col, colIndex) {
+                    // 原来是1 现在是0的  方块
+
+                    // 旧的坐标是否等于当前的
+                    if (_this.oldCoor[rowIndex][colIndex] === 1 && col === 0) {
+
+                        // 存储
+                        // 当前存储的变量  就是变化时不见得方块的位置  
+                        var delNode = _this.nodes[rowIndex][colIndex];
+
+                        // 删除
+                        //   cloneNode() 方法克隆所有属性以及它们的值
+                        // 克隆一遍当前删除的方块
+                        var newNode = delNode.cloneNode(true);
+
+
+                        // console.log("删除了一个dot", rowIndex, colIndex, newNode);
+
+                        // 新对象的位置   取到老节点的位置
+                        var newNodeObj = new AnimateDot(delNode.offsetLeft, delNode.offsetTop, newNode);
+                        // console.log(newNodeObj)
+
+                        newNodeObj.node.classList.add("animate-dot");
+                        newNodeObj.node.style.left = newNodeObj.x + "px";
+                        newNodeObj.node.style.top = newNodeObj.y + "px";
+                        // console.log(newNodeObj);
+                        allAnimateDots.push(newNodeObj);
+
+                        // 追加掉落的小点
+                        mask.appendChild(newNodeObj.node);
+                    }
+                });
+            });
+        };
+
+        // var x = new Num(3);
+        // x.create();
+        // x.update();
+
+        function padStart(n) {
+            return (n = n < 10 ? "0" + n : String(n));
+        }
+
+        function timeToArray() {
+            var d = new Date();
+            var hh = d.getHours();
+            var mm = d.getMinutes();
+            var ss = d.getSeconds();
+            hh = padStart(hh);
+            mm = padStart(mm);
+            ss = padStart(ss);
+            return (hh + mm + ss).split("");
+        }
+
+        //
+        var time = timeToArray();
+        var nums = [];
+        time.forEach(function (n) {
+            // console.log(element);
+            nums.push(new Num(n).create().update());
+        });
+
+        setInterval(() => {
+            var newTime = timeToArray();
+
+            // 新时间 更新 dom
+            newTime.forEach(function (n, i) {
+                // 判断哪一个数字有变化 没有变化的就没必要更新
+                if (n !== time[i]) {
+                    nums[i].update(n);
+
+
+                    nums[i].checkHide();// 这是调用下落的小点  显示出它改变时的跳动
+                }
+            });
+            time = newTime;
+        }, 500);
+
+
+        // 掉落小点的每一帧事件
+        setInterval(() => {
+            allAnimateDots.forEach(function (animateDot, index) {//带一个参数index
+                animateDot.move();
+
+                //checkover 下掉   调用上面的删除效果、
+                animateDot.checkOver(index);
+            });
+        }, 1000 / 60);
+    </script>
+</body>
+
+</html>

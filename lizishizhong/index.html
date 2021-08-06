@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- 引入js -->
+    <script src="main.js"></script>
+    <style>
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(241, 231, 231);
+        }
+
+        .box {
+            width: 800px;
+            height: 300px;
+            margin: 0 auto;
+            margin-top: 150px;
+            border: 1px solid rgb(133, 172, 190);
+            background-color: black;
+
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .content {
+            width: 75px;
+            height: 125px;
+            /* border: 1px solid red; */
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .content:nth-child(2n) {
+            margin-right: 50px;
+        }
+
+        .content:nth-child(2n + 1) {
+            margin-right: 25px;
+        }
+
+        .content li {
+            width: 25px;
+            height: 25px;
+            /* background-color: black; */
+            padding: 2px;
+
+            /* border-box	为元素设定的宽度和高度决定了元素的边框盒。 */
+            /* 为元素指定的任何内边距和边框都将在已设定的宽度和高度内进行绘制。 */
+            box-sizing: border-box;
+            background-clip: content-box;
+
+            transition: all 0.3s;
+            /* transition: all 3s; */
+            transform: scale(0.5);
+            /* border-radius: 50%; */
+        }
+
+        .content li.active {
+            background-color: white;
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <section class="stage"></section>
+    </div>
+    <script>
+        // 查看x里面的数组
+        function Num(x) {
+            this.num = x;
+
+            // this.coor=matrix[this.num];
+        }
+
+        //  根据数值获取坐标
+        Num.prototype.calcCoor = function () {
+            return matrix[this.num];
+        };
+
+        //   方法调用
+        //  创建每个数字 的所有dom元素   create创建
+        Num.prototype.create = function () {
+            this.coor = this.calcCoor();
+
+
+            // // 创建一个ul  Document.createElement() 方法用于创建一个由标签名称 tagName 指定的 HTML 元素
+            var content = document.createElement("ul");
+
+            // 追加样式名content   classList.add( newClassName )添加新的类名；
+            content.classList.add("content");
+
+            // 根据coor二维数组 生成 dom节点 并把节点也映射为二维坐标 并保存到当前对象nodes属性
+            // 这里保存到nodes目的是方便后面更新获取 所有的 dot节点
+            // nodes格式为二维数组 方便后面根据coor更新 一维数组也可以比较麻烦
+            var nodes = [];
+
+
+            // 考虑到多层遍历,使用用foEach最好  forEach 每个都遍历一次
+            // row行  rowIndex第几行
+            this.coor.forEach(function (row, rowIndex) {
+                var rowNodes = [];
+                // col列  colIndex几列
+                row.forEach(function (col, colIndex) {
+                    // console.log(row, col);
+                    var dot = document.createElement("li");
+                    rowNodes.push(dot);
+
+                    // 1.ul的li 追加样式dot
+                    content.appendChild(dot);
+                });
+                // push() 方法向数组的末尾添加元素rownodes
+                nodes.push(rowNodes);
+            });
+
+            // 将所有节点数组保存到属性
+            this.nodes = nodes;
+
+            // 把内容加到stage里面  appendChild() 方法向节点添加最后一个子节点
+            document.querySelector(".stage").appendChild(content);
+
+            return this;
+        };
+
+        //  根据当前数值更新坐标并 更新所有dot的class
+        Num.prototype.update = function (n) {
+            // 更新 num coor
+            if (n !== undefined) {
+                this.num = n;
+            }
+            this.coor = this.calcCoor();
+
+            // 根据新坐标重新确定每个点的class
+            var _this = this;
+            // forEach内部 this指向 window。
+            this.coor.forEach(function (row, rowIndex) {
+                row.forEach(function (col, colIndex) {
+                    if (col) {
+                        //   console.log(this);
+                        // 添加新类名active
+                        _this.nodes[rowIndex][colIndex].classList.add("active");
+                    } else {
+                        // classList.remove( oldClassName )移除已经存在的类名；
+                        _this.nodes[rowIndex][colIndex].classList.remove("active");
+                    }
+                });
+            });
+            return this;
+        };
+
+        // 测试一个
+        // //调用数组
+        // var x = new Num(3);
+        // //  x.draw();
+        // //调用create()方法
+        // x.create();
+        // x.update();
+
+
+        // 封装一个方法   padstart为起始
+        function padStart(n) {
+
+            // 返回n  如果为真就补0   否则就转为字符串的n
+            return (n = n < 10 ? "0" + n : String(n));
+        }
+
+        // a全部时间封装数组
+        function timeToArray() {
+            var d = new Date();
+            // 时
+            var hh = d.getHours();
+            // 分
+            var mm = d.getMinutes();
+            // 秒
+            var ss = d.getSeconds();
+
+            // 调用转字符串方法
+            hh = padStart(hh);
+            mm = padStart(mm);
+            ss = padStart(ss);
+
+            // 时间加起来，返回数组  split()方法用于把一个字符串分割成字符串数组
+            return (hh + mm + ss).split("");
+            // 把时间字符串分割成时间数组字符串
+            // [151213]   [15 12 13]
+        }
+
+        //a把时间放在一个数组里
+        var time = timeToArray();
+
+        // b定义一个数组
+        var nums = [];
+
+        // 遍历时间数组
+        time.forEach(function (n) {
+            // console.log(element);
+
+            // b使用数组 push() 方法可向数组的末尾添加元素  create()创建  update()首次显示
+            nums.push(new Num(n).create().update());
+            // 
+        });
+
+
+        // 定时器刷新
+        setInterval(() => {
+
+            // 获取时间当前时间
+            var newTime = timeToArray();
+
+            // 更新新时间
+            // 遍历新时间的数组 下标i
+            newTime.forEach(function (n, i) {
+
+                // 如果判断n不等于
+                if (n !== time[i]) {
+
+                    //是就 每次更新n
+                    nums[i].update(n);
+                }
+            });
+            time = newTime;
+        }, 500);
+    </script>
+</body>
+
+</html>
