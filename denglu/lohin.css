@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  background-color: #4e69b3;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  align-items: center;
+  perspective: 1000px;
+}
+body .stage {
+  width: 440px;
+  height: 400px;
+  background-color: #2a2b38;
+  background-image: url(img/pat.svg);
+  background-position: center;
+  background-size: cover;
+  border-radius: 10px;
+  position: relative;
+  transform-style: preserve-3d;
+  color: white;
+  transition: all 0.5s;
+}
+body .stage.active {
+  transform: rotateY(180deg);
+}
+body .stage form {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 40px 50px;
+  box-sizing: border-box;
+}
+body .stage form h1 {
+  text-align: center;
+}
+body .stage form input {
+  display: block;
+  width: 100%;
+  background-color: #18181b;
+  margin: 15px 0;
+  border: none;
+  outline: none;
+  line-height: 3;
+  border-radius: 5px;
+}
+body .stage form input[type="sumit"] {
+  width: 100px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: #ffeba7;
+  transition: all 0.5s;
+}
+body .stage form input[type="sumit"]:hover {
+  background-color: #f3d97f;
+}
+body .stage form .info {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+body .stage form.login {
+  transform: translateZ(50px);
+}
+body .stage form.login .lis {
+  width: 100%;
+  height: 50px;
+  margin: 5px 0;
+  background-color: #18181b;
+  display: flex;
+  align-items: center;
+}
+body .stage form.login .lis .mybook {
+  margin: 0 10px;
+  font-size: 35px;
+  color: #222229;
+}
+body .stage form.register {
+  transform: translateZ(-50px) rotateY(180deg);
+}
+body .stage form.register .lis {
+  width: 100%;
+  height: 50px;
+  margin: 5px 0;
+  background-color: #18181b;
+  display: flex;
+  align-items: center;
+}
+body .stage form.register .lis .mybook {
+  margin: 0 10px;
+  font-size: 35px;
+  color: #222229;
+}
+body .stage form.register .info {
+  display: flex;
+  justify-content: center;
+}
+/*# sourceMappingURL=./lohin.css.map */

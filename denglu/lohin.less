@@ -1,0 +1,123 @@
+body{
+    margin: 0;
+    background-color: rgb(78, 105, 179);
+
+    display: flex;
+    justify-content: center;//水平居中
+    height: 100vh;//可视区域100%
+    align-items: center;//垂直居中   在之前要考虑高度 否则实现不了垂直
+
+    perspective: 1000px;//透视  看到注册是反的 改
+    .stage{
+        width: 440px;
+        height: 400px;
+        // padding: 40px 20px;
+        background-color:  #2a2b38;
+        background-image: url(./img/pat.svg);//引入图片
+        background-position: center;//背景起始位置 居中
+        background-size: cover;//设置背景尺寸  cover扩大
+        border-radius: 10px;
+
+        position: relative;//相对定位
+
+        transform-style: preserve-3d;  //旋转属性
+        // perspective: 500px;//透视
+        // transform: rotateY(60deg);//旋转60deg  得加透视才容易看到  透视加在前（body）才感觉不怪
+        color: white;
+
+        transition: all .5s;
+        // 另外一个状态
+        &.active{
+            transform: rotateY(180deg);
+        }
+        form{//公共样式  
+            position: absolute;//绝对定位
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            // 这样样式会改变 向外扩展 宽高不对 那就盒子模型
+            padding: 40px 50px;
+            box-sizing: border-box;//盒子模型 计算属性
+            h1{
+                text-align: center;
+            }
+            // 上面样式开始
+            input{
+                display: block;//设置块级元素
+                width: 100%;
+
+                background-color: #18181b;
+                margin: 15px 0;
+                border: none;//边框去掉
+                outline: none;//轮廓去掉
+                line-height: 3;//3倍行高
+                border-radius: 5px;
+                
+                &[type="sumit"]{//单独给登录设置样式
+                    width: 100px;
+                    margin: 0 auto;
+                    text-align: center;
+                    background-color: #ffeba7;
+
+                    transition: all 0.5s;//指上去 过渡
+                    &:hover{
+                        background-color: #f3d97f;
+                    }
+                }
+            }
+            .info{
+                display: flex;
+                justify-content: space-between;
+                cursor: pointer;
+            }
+            &.login{
+                transform: translateZ(50px);//z轴旋转
+                // background-color: gray;
+
+                .lis{
+                    width: 100%;
+                    height: 50px;
+                    margin: 5px 0;
+                    background-color: #18181b;
+
+                    display: flex;
+                    align-items: center;
+                    .mybook{
+                        margin: 0 10px;
+                        font-size: 35px;
+                        color:  #222229;
+                    }
+                }
+            }
+
+            // 上面样式结束
+            // 下面样式开始
+            &.register{
+                transform: translateZ(-50px) rotateY(180deg);
+                // transform: rotateY(180deg);//透视看到看到是放的 再沿着y旋180deg
+                // background-color: red;
+                .lis{
+                    width: 100%;
+                    height: 50px;
+                    margin: 5px 0;
+                    background-color: #18181b;
+
+                    display: flex;
+                    align-items: center;
+                    .mybook{
+                        margin: 0 10px;
+                        font-size: 35px;
+                        color:  #222229;
+                    }
+                }
+                .info{
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+            // 下面样式结束
+        }
+    }
+}
