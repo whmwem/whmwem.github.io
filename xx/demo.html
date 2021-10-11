@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html{
+            height: 100%;
+        }
+        /* 默认body的高度是由body里面的内容撑开的 */
+        /* 如果直接设置body的高度为100%,那么还需要设置html标签的高度为100% */
+        body{
+            height: 100%;
+            background:url(images/bg.jpg) no-repeat;
+            background-size:100% 100%;
+            overflow: hidden;
+        }
+        .box{
+            width: 1089px;
+            height: 429px;
+            margin:0 auto;
+            /* margin-top: 227px; */
+            padding-top: 100px;
+            /* 溢出隐藏 */
+            overflow: hidden;
+        }
+       
+        .box .item{
+            float: left;
+            width: 100px;
+            height: 429px;
+            border-radius: 100px;
+        }
+        .box .item:nth-child(1){
+            width: 789px;
+            background:url(images/1.jpg);
+        }
+        .box .item:nth-child(2){
+            background:url(images/2.jpg);
+        }
+        .box .item:nth-child(3){
+            background:url(images/3.jpg);
+        }
+        .box .item:nth-child(4){
+            background:url(images/4.jpg);
+        }
+        .box .item p{
+            width: 20px;
+            background: rgba(0,0,0,0);
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-top: 72px;
+            height: 357px;
+            color:white;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="item">
+            <p>我的个人拉萨之旅｜｜故事之城</p>
+        </div>
+        <div class="item">
+            <p>我的个人拉萨之旅｜｜故事之城</p>
+        </div>
+        <div class="item">
+            <p>我的个人拉萨之旅｜｜故事之城</p>
+        </div>
+        <div class="item">
+            <p>我的个人拉萨之旅｜｜故事之城</p>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script>
+        // 给.item绑定鼠标移上事件
+        $(".box .item").mouseover(function(){
+            // 如果使用链式编程,我们本练习,会出现最后一个.item掉下去的情况
+            // $(this).stop().animate({"width":789}).siblings(".item").stop().animate({"width":100})
+
+
+            // 先让其他兄弟.item宽度改为100px
+            $(this).siblings(".item").stop().animate({"width":100});
+            // 再让当前.item宽度改为789px
+            $(this).stop().animate({"width":789});
+        })
+    </script>
+</body>
+</html>
